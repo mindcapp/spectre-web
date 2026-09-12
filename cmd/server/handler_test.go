@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +14,7 @@ type fakeDomainRepository struct {
 	domains map[string]models.Domain
 }
 
-func (f *fakeDomainRepository) Register(_ context.Context, domain models.Domain) error {
+func (f *fakeDomainRepository) Register(domain models.Domain) error {
 	if _, exists := f.domains[domain.Name]; exists {
 		return ErrDomainExists
 	}
@@ -23,7 +22,7 @@ func (f *fakeDomainRepository) Register(_ context.Context, domain models.Domain)
 	return nil
 }
 
-func (f *fakeDomainRepository) Resolve(_ context.Context, name string) (models.Domain, error) {
+func (f *fakeDomainRepository) Resolve(name string) (models.Domain, error) {
 	domain, exists := f.domains[name]
 	if !exists || !domain.IsActive {
 		return models.Domain{}, ErrDomainNotFound
@@ -31,7 +30,7 @@ func (f *fakeDomainRepository) Resolve(_ context.Context, name string) (models.D
 	return domain, nil
 }
 
-func (f *fakeDomainRepository) ListActive(_ context.Context) ([]models.Domain, error) {
+func (f *fakeDomainRepository) ListActive() ([]models.Domain, error) {
 	result := make([]models.Domain, 0)
 	for _, domain := range f.domains {
 		if domain.IsActive {

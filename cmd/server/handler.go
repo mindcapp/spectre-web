@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -44,7 +45,7 @@ func (h *RegistryHandler) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	domain := models.Domain{Name: request.Name, TargetURL: request.TargetURL, IsActive: true}
-	if err := h.repository.Register(r.Context(), domain); err != nil {
+	if err := h.repository.Register(domain); err != nil {
 		if errors.Is(err, ErrDomainExists) {
 			writeError(w, http.StatusConflict, ErrDomainExists.Error())
 			return
@@ -65,7 +66,7 @@ func (h *RegistryHandler) resolve(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "domain is required")
 		return
 	}
-	domain, err := h.repository.Resolve(r.Context(), name)
+	domain, err := h.repository.Resolve(name)
 	if err != nil {
 		if errors.Is(err, ErrDomainNotFound) {
 			writeError(w, http.StatusNotFound, ErrDomainNotFound.Error())
@@ -82,7 +83,7 @@ func (h *RegistryHandler) listActive(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
-	domains, err := h.repository.ListActive(r.Context())
+	domains, err := h.repository.ListActive()
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "failed to list domains")
 		return
@@ -117,3 +118,5 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, map[string]string{"error": message})
 }
+
+var _ context.Context

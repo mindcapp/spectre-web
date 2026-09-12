@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -15,15 +14,15 @@ var (
 )
 
 type DomainRepository interface {
-	Register(context.Context, models.Domain) error
-	Resolve(context.Context, string) (models.Domain, error)
-	ListActive(context.Context) ([]models.Domain, error)
+	Register(models.Domain) error
+	Resolve(string) (models.Domain, error)
+	ListActive() ([]models.Domain, error)
 }
 
 type DomainStore struct{ db *sql.DB }
 
-func (s *DomainStore) InitSchema(ctx context.Context) error {
-	_, err := s.db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS domains (
+func (s *DomainStore) InitSchema() error {
+	_, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS domains (
 		name TEXT PRIMARY KEY,
 		target_url TEXT NOT NULL,
 		is_active BOOLEAN NOT NULL DEFAULT TRUE
@@ -31,8 +30,8 @@ func (s *DomainStore) InitSchema(ctx context.Context) error {
 	return err
 }
 
-func (s *DomainStore) Register(ctx context.Context, domain models.Domain) error {
-	_, err := s.db.ExecContext(ctx,
+func (s *DomainStore) Register(domain models.Domain) error {
+	_, err := s.db.Exec(
 		`INSERT INTO domains (name, target_url, is_active) VALUES ($1, $2, $3)`,
 		domain.Name, domain.TargetURL, domain.IsActive)
 	if err != nil {
@@ -45,9 +44,9 @@ func (s *DomainStore) Register(ctx context.Context, domain models.Domain) error 
 	return nil
 }
 
-func (s *DomainStore) Resolve(ctx context.Context, name string) (models.Domain, error) {
+func (s *DomainStore) Resolve(name string) (models.Domain, error) {
 	var domain models.Domain
-	err := s.db.QueryRowContext(ctx,
+	err := s.db.QueryRow(
 		`SELECT name, target_url, is_active FROM domains WHERE name = $1 AND is_active = TRUE`, name,
 	).Scan(&domain.Name, &domain.TargetURL, &domain.IsActive)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -59,8 +58,8 @@ func (s *DomainStore) Resolve(ctx context.Context, name string) (models.Domain, 
 	return domain, nil
 }
 
-func (s *DomainStore) ListActive(ctx context.Context) ([]models.Domain, error) {
-	rows, err := s.db.QueryContext(ctx,
+func (s *DomainStore) ListActive() ([]models.Domain, error) {
+	rows, err := s.db.Query(
 		`SELECT name, target_url, is_active FROM domains WHERE is_active = TRUE ORDER BY name`)
 	if err != nil {
 		return nil, err

@@ -10,5 +10,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.7
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: masterKey
+    volumes:
+      - meili_data:/meili_data
+
 volumes:
   postgres_data:
+  meili_data:
