@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#090b12" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' http://localhost:8080 http://127.0.0.1:8080; object-src 'none'; base-uri 'none'; frame-src https: http:;" />
+    <meta name="description" content="Spectre web — независимый браузер с объединённым поиском" />
+    <title>Spectre web</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">К основному содержимому</a>
+    <main class="app" id="app">
+      <div class="page-warp" id="page-warp" aria-hidden="true"><span class="loading-spinner"><i></i><i></i><i></i></span></div>
+      <header class="topbar">
+        <div class="drag-space" aria-hidden="true"></div>
+        <div class="tabs" id="tabs" role="tablist" aria-label="Открытые вкладки"></div>
+        <button class="tab-add" id="new-tab" type="button" aria-label="Новая вкладка">+</button>
+        <div class="window-controls" id="window-controls">
+          <button data-window="minimize" aria-label="Свернуть">−</button>
+          <button data-window="maximize" aria-label="Развернуть">□</button>
+          <button data-window="close" aria-label="Закрыть">×</button>
+        </div>
+      </header>
+
+      <section class="toolbar">
+        <button class="brand" id="home-button" type="button" aria-label="На главную">
+          <span class="brand-mark">S</span>
+        </button>
+        <nav class="nav-buttons" aria-label="Навигация">
+          <button id="back" class="icon-button" type="button" aria-label="Назад">←</button>
+          <button id="forward" class="icon-button" type="button" aria-label="Вперёд">→</button>
+          <button id="reload" class="icon-button" type="button" aria-label="Обновить">↻</button>
+        </nav>
+        <form class="omnibox" id="address-form">
+          <span class="site-state" id="site-state" title="Состояние соединения">◇</span>
+          <input id="address" autocomplete="off" spellcheck="false" aria-label="Адрес или запрос" placeholder="Введите адрес или найдите что-нибудь" />
+          <span class="engine-pill" title="Поиск Spectre web">SPECTRE</span>
+        </form>
+        <button id="bookmark-current" class="icon-button" type="button" aria-label="Добавить закладку">☆</button>
+        <button id="privacy" class="icon-button protected" type="button" aria-label="Защита">◈</button>
+        <button id="menu" class="icon-button" type="button" aria-label="Меню">•••</button>
+      </section>
+
+      <section class="bookmarks-bar" id="bookmarks-bar" aria-label="Панель закладок">
+        <div id="bookmark-shortcuts" class="bookmark-shortcuts"></div>
+      </section>
+
+      <section class="content" id="content" tabindex="-1">
+        <section class="home-page" id="home-page" aria-label="Главная страница Spectre web">
+          <div class="river-backdrop depth-0" aria-hidden="true">
+            <video id="river-background" autoplay muted loop playsinline preload="auto" poster="./assets/river-poster.jpg">
+              <source src="./assets/river-loop.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="river-scrim depth-1" aria-hidden="true"></div>
+          <div class="home-content">
+            <div class="identity depth-3" data-animate="hero">
+              <span class="large-mark">S</span>
+              <div><h1>Spectre web</h1><p>Ваш интернет. В одном окне.</p></div>
+            </div>
+            <form class="hero-search depth-4" id="hero-search" data-animate="search">
+              <span class="search-icon">⌕</span>
+              <input id="hero-input" autocomplete="off" aria-label="Поиск Spectre web" placeholder="Искать в интернете через Spectre web" />
+              <button type="submit">Найти</button>
+            </form>
+            <div class="source-line"><span><i class="source-dot veil"></i>Spectre web</span><b>·</b><span>единая выдача без повторов</span></div>
+            <div class="quick-grid depth-4" data-animate="cards">
+              <button type="button" data-open="https://www.youtube.com"><span>▶</span><b>YouTube</b><small>Видео</small></button>
+              <button type="button" data-open="https://mail.google.com"><span>✉</span><b>Почта</b><small>Gmail</small></button>
+              <button type="button" data-open="https://web.telegram.org"><span>✦</span><b>Telegram</b><small>Web</small></button>
+              <button type="button" data-open="https://github.com"><span>⌘</span><b>GitHub</b><small>Код</small></button>
+              <button type="button" id="quick-private"><span>◐</span><b>Инкогнито</b><small>Без сохранения</small></button>
+            </div>
+            <div class="scene-switcher" id="scene-switcher" aria-label="Заставки">
+              <span>Заставка</span>
+              <button type="button" data-scene="river" aria-pressed="true">Река</button>
+              <button type="button" data-scene="waves" aria-pressed="false">Волны</button>
+              <button type="button" data-scene="ocean" aria-pressed="false">Океан</button>
+            </div>
+          </div>
+          <footer class="home-footer"><span>Chromium engine</span><span>Объединённый поиск</span><span>Защита от трекеров</span></footer>
+        </section>
+
+        <section class="results-page" id="results-page" hidden>
+          <div class="results-shell">
+            <header class="results-head">
+              <button class="results-logo" id="results-home" type="button"><span class="brand-mark">S</span><b>Spectre web</b></button>
+              <form class="results-search" id="results-search">
+                <input id="results-input" autocomplete="off" aria-label="Поисковый запрос" />
+                <button type="submit">Найти</button>
+              </form>
+            </header>
+            <div class="results-meta">
+              <div class="filter-tabs" id="filter-tabs">
+                <button class="active" data-filter="all">Все результаты</button>
+              </div>
+              <span id="results-count">Поиск…</span>
+            </div>
+            <section class="image-block" id="image-block" hidden>
+              <div class="image-block-head"><b>Изображения</b><button id="toggle-images" type="button" aria-expanded="true" aria-controls="image-strip">Скрыть</button></div>
+              <div class="image-strip" id="image-strip"></div>
+            </section>
+            <div class="results-layout">
+              <div class="results-list" id="results-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="webviews" id="webviews" hidden>
+          <div class="load-progress" id="load-progress"></div>
+          <div class="webview-host" id="webview-host"></div>
+          <div class="page-error" id="page-error" hidden>
+            <span>!</span><h2>Страница не открылась</h2><p id="page-error-text">Проверьте адрес и подключение к интернету.</p><button id="retry-page">Попробовать снова</button>
+          </div>
+        </section>
+        <section class="spectre-page" id="spectre-page" hidden aria-label="Spectre web">
+          <div class="spectre-card"><div class="spectre-brand"><span class="brand-mark">S</span><b>Spectre web</b></div><div class="spectre-hero"><span class="spectre-icon">♪</span><h1>Spectre web</h1><p>Статичный просмотр TikTok</p></div><div class="spectre-note">Страница открыта в безопасном режиме Spectre web.</div></div>
+        </section>
+      </section>
+
+      <aside class="side-panel" id="side-panel" hidden>
+        <header><div><span id="panel-kicker">SPECTRE WEB</span><h2 id="panel-title">Меню</h2></div><button id="panel-close" aria-label="Закрыть">×</button></header>
+        <div class="panel-body" id="panel-body"></div>
+      </aside>
+      <div class="panel-backdrop" id="panel-backdrop" hidden></div>
+      <div class="suggestions" id="suggestions" hidden></div>
+      <div class="toast" id="toast" role="status" hidden></div>
+      <div class="image-viewer" id="image-viewer" role="dialog" aria-modal="true" aria-label="Просмотр изображения" hidden>
+        <button class="image-viewer-close" id="image-viewer-close" type="button" aria-label="Закрыть изображение">×</button>
+        <figure>
+          <img id="image-viewer-picture" alt="" referrerpolicy="no-referrer" />
+          <figcaption><span id="image-viewer-title"></span><button id="image-viewer-open" type="button">Открыть страницу</button></figcaption>
+        </figure>
+      </div>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
