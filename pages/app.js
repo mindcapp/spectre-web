@@ -393,7 +393,7 @@
     const url = normalized.type === "search" ? `${SEARCH_PREFIX}${encodeURIComponent(normalized.value)}` : normalized.value;
     if (options.push !== false) pushHistory(tab, url);
     tab.url = url;
-    tab.title = isTikTok ? "Spectre web" : normalized.type === "search" ? `${normalized.value} — Поиск` : displayHost(url);
+    tab.title = normalized.type === "search" ? `${normalized.value} — Поиск` : displayHost(url);
     tab.favicon = "";
     save();
     showCurrentPage();
